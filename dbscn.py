@@ -109,3 +109,27 @@ for clust_number in set(labels):
         ceny=np.mean(clust_set.ym) 
         plt.text(cenx,ceny,str(clust_number), fontsize=25, color='red',)
         print ("Cluster "+str(clust_number)+', Avg Temp: '+ str(np.mean(clust_set.Tm)))
+
+
+# Clustering of stations based on their location, mean, max, and min Temperature
+from sklearn.cluster import DBSCAN
+import sklearn.utils
+from sklearn.preprocessing import StandardScaler
+sklearn.utils.check_random_state(1000)
+Clus_dataSet = pdf[['xm','ym','Tx','Tm','Tn']]
+Clus_dataSet = np.nan_to_num(Clus_dataSet)
+Clus_dataSet = StandardScaler().fit_transform(Clus_dataSet)
+
+# Compute DBSCAN
+db = DBSCAN(eps=0.3, min_samples=10).fit(Clus_dataSet)
+core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+core_samples_mask[db.core_sample_indices_] = True
+labels = db.labels_
+pdf["Clus_Db"]=labels
+
+realClusterNum=len(set(labels)) - (1 if -1 in labels else 0)
+clusterNum = len(set(labels)) 
+
+
+# A sample of clusters
+pdf[["Stn_Name","Tx","Tm","Clus_Db"]].head(5)
