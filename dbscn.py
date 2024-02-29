@@ -53,3 +53,26 @@ for index,row in pdf.iterrows():
 #plt.text(x,y,stn)
 plt.show()
 
+
+# Clustering of stations based on their location i.e. Lat & Lon
+import sklearn.utils
+from sklearn.preprocessing import StandardScaler
+sklearn.utils.check_random_state(1000)
+Clus_dataSet = pdf[['xm','ym']]
+Clus_dataSet = np.nan_to_num(Clus_dataSet)
+Clus_dataSet = StandardScaler().fit_transform(Clus_dataSet)
+
+# Compute DBSCAN
+db = DBSCAN(eps=0.15, min_samples=10).fit(Clus_dataSet)
+core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+core_samples_mask[db.core_sample_indices_] = True
+labels = db.labels_
+pdf["Clus_Db"]=labels
+
+realClusterNum=len(set(labels)) - (1 if -1 in labels else 0)
+clusterNum = len(set(labels)) 
+
+
+# A sample of clusters
+pdf[["Stn_Name","Tx","Tm","Clus_Db"]].head(5)
+
